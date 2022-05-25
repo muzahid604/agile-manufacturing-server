@@ -18,12 +18,35 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db('drill-products').collection('products');
+
         app.get('/products', async (req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
         });
+
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const product = await productsCollection.findOne(query);
+            res.send(product);
+        })
+
+        app.put('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateItems = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    quantity: updateItems.Quantity
+                }
+            };
+            const result = await productsCollection.updateOne(filter, updatedDoc, options);
+            const answer = await productsCollection.findOne(filter);
+            res.send(answer);
+        })
 
 
     }
