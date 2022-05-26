@@ -18,6 +18,7 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db('drill-products').collection('products');
+        const ordersCollection = client.db('drill-products').collection('orders');
 
         app.get('/products', async (req, res) => {
             const query = {};
@@ -47,6 +48,36 @@ async function run() {
             const answer = await productsCollection.findOne(filter);
             res.send(answer);
         })
+        //order collection api
+        app.post('/orders', async (req, res) => {
+            const order = req.body
+            const result = await ordersCollection.insertOne(order);
+            res.send(result)
+        })
+        //get
+        app.get('/orders', async (req, res) => {
+
+            const query = {};
+            const cursor = ordersCollection.find(query);
+            const order = await cursor.toArray();
+            res.send(order);
+        });
+        app.get('/order', async (req, res) => {
+            const customer = req.query.customer
+            const query = { customer: customer };
+            console.log(query)
+            const cursor = ordersCollection.find(query);
+            const order = await cursor.toArray();
+            res.send(order);
+        });
+        //delete
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await itemsCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
 
     }
