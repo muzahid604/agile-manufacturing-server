@@ -19,6 +19,7 @@ async function run() {
         await client.connect();
         const productsCollection = client.db('drill-products').collection('products');
         const ordersCollection = client.db('drill-products').collection('orders');
+        const usersCollection = client.db('drill-products').collection('users');
 
         app.get('/products', async (req, res) => {
             const query = {};
@@ -26,6 +27,18 @@ async function run() {
             const products = await cursor.toArray();
             res.send(products);
         });
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: user,
+            };
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
 
         app.get('/products/:id', async (req, res) => {
             const id = req.params.id;
