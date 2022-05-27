@@ -16,7 +16,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    console.log('he', authHeader)
+
     if (!authHeader) {
         return res.status(401).send({ massage: 'unauthorize' })
     }
@@ -58,12 +58,32 @@ async function run() {
             res.send({ result, token });
         })
 
+
+        app.get('/users', verifyJWT, async (req, res) => {
+            const cursor = usersCollection.find();
+            const users = await cursor.toArray();
+            res.send(users);
+        });
+
+        // make admin 
+        app.put('/users/admin/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updatedDoc = {
+                $set: { role: 'admin' },
+            };
+            const result = await usersCollection.updateOne(filter, updatedDoc);
+            res.send(result);
+        })
+
+
         app.get('/products/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const product = await productsCollection.findOne(query);
             res.send(product);
         })
+
 
         app.put('/products/:id', async (req, res) => {
             const id = req.params.id;
@@ -85,6 +105,8 @@ async function run() {
             const result = await ordersCollection.insertOne(order);
             res.send(result)
         })
+
+
         //get
         app.get('/orders', async (req, res) => {
 
@@ -94,6 +116,24 @@ async function run() {
             res.send(order);
         });
         app.get('/order', verifyJWT, async (req, res) => {
+            const customer = req.query.customer
+            const authorization = req.headers.authorization
+            const decodedEmail = req.decoded.email
+            if (customer === decodedEmail) {
+                const query = { customer: customer };
+                const cursor = ordersCollection.find(query);
+                const order = await cursor.toArray();
+                return res.send(order);
+            }
+            else {
+                return res.status(403).send({ massage: 'forbidden access' })
+            }
+
+        });
+
+        // for pay 
+        app.get('/order/:id', verifyJWT, async (req, res) => {
+
             const customer = req.query.customer
             const authorization = req.headers.authorization
             const decodedEmail = req.decoded.email
