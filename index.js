@@ -16,7 +16,6 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
         return res.status(401).send({ massage: 'unauthorize' })
     }
@@ -76,14 +75,12 @@ async function run() {
             res.send(result);
         })
 
-
         app.get('/products/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const product = await productsCollection.findOne(query);
             res.send(product);
         })
-
 
         app.put('/products/:id', async (req, res) => {
             const id = req.params.id;
@@ -105,8 +102,6 @@ async function run() {
             const result = await ordersCollection.insertOne(order);
             res.send(result)
         })
-
-
         //get
         app.get('/orders', async (req, res) => {
 
@@ -130,24 +125,6 @@ async function run() {
             }
 
         });
-
-        // for pay 
-        app.get('/order/:id', verifyJWT, async (req, res) => {
-
-            const customer = req.query.customer
-            const authorization = req.headers.authorization
-            const decodedEmail = req.decoded.email
-            if (customer === decodedEmail) {
-                const query = { customer: customer };
-                const cursor = ordersCollection.find(query);
-                const order = await cursor.toArray();
-                return res.send(order);
-            }
-            else {
-                return res.status(403).send({ massage: 'forbidden access' })
-            }
-
-        });
         //delete
         app.delete('/order/:id', async (req, res) => {
             const id = req.params.id;
@@ -155,25 +132,15 @@ async function run() {
             const result = await itemsCollection.deleteOne(query);
             res.send(result);
         })
-
-
-
     }
     finally {
 
     }
-
-
-
 }
-
-
-
 
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
     res.send('warehouse server worked')
 })
-
 app.listen(port, () => console.log('port worked'));
