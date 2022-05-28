@@ -29,6 +29,7 @@ const verifyJWT = (req, res, next) => {
     })
 }
 
+// run function
 async function run() {
 
     try {
