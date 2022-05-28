@@ -103,7 +103,6 @@ async function run() {
             const order = req.body
             const result = await ordersCollection.insertOne(order);
             res.send(result)
-            // order 
         })
         //get
         app.get('/orders', async (req, res) => {
@@ -123,7 +122,7 @@ async function run() {
                 return res.send(order);
             }
             else {
-                return res.status(403).send({ massage: 'sorry forbidden access' })
+                return res.status(403).send({ massage: 'so sorry forbidden access' })
             }
 
         });
