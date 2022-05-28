@@ -96,7 +96,7 @@ async function run() {
             const answer = await productsCollection.findOne(filter);
             res.send(answer);
         })
-        //order collection api
+
         app.post('/orders', async (req, res) => {
             const order = req.body
             const result = await ordersCollection.insertOne(order);
