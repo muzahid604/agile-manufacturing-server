@@ -103,6 +103,7 @@ async function run() {
             const order = req.body
             const result = await ordersCollection.insertOne(order);
             res.send(result)
+            // order 
         })
         //get
         app.get('/orders', async (req, res) => {
