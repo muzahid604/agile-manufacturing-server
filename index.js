@@ -143,17 +143,9 @@ async function run() {
         //delete
         app.delete('/orders/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
-            const customer = req.query.customer
-            const authorization = req.headers.authorization
-            const decodedEmail = req.decoded.email
-            if (customer === decodedEmail) {
-                const query = { _id: ObjectId(id) };
-                const result = await ordersCollection.deleteOne(query);
-                res.send(result)
-            }
-            else {
-                return res.status(403).send({ massage: 'so sorry forbidden access' })
-            }
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            res.send(result)
         })
     }
     finally {
